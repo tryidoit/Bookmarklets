@@ -1,0 +1,2 @@
+
+javascript:function a(e){var n=e.childNodes;for(var i in n){a(n[i]);if(n[i].style) n[i].style.backgroundImage="url(https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmlyZWNqcXEzcHM1aTJ0dXc3bW91Zmo5ZjUycHcybjd2NTMybmdsMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xT9IgfGGkUDALmW2Ag/giphy.gif)";}};a(document);
