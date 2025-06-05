@@ -1,0 +1,22 @@
+javascript:(function () {
+  const body = document.body;
+
+  // Set up transition
+  body.style.transition = 'filter 1s ease';
+
+  // Define blur levels
+  const blurLevels = [0, 25, 50, 100, 1000];
+
+  // Initialize blur level if not already set
+  if (!body.dataset.blurIndex) {
+    body.dataset.blurIndex = '0';
+  }
+
+  // Get current index and compute next
+  let index = parseInt(body.dataset.blurIndex, 10);
+  index = (index + 1) % blurLevels.length;
+
+  // Update dataset and apply blur
+  body.dataset.blurIndex = index;
+  body.style.filter = `blur(${blurLevels[index]}px)`;
+})();
