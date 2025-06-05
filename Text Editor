@@ -1,0 +1,133 @@
+javascript:(function () {
+  // Turn off if already active
+  if (window.__clickToEditActive__) {
+    deactivate();
+    return;
+  }
+
+  // Activate mode
+  window.__clickToEditActive__ = true;
+  document.body.style.cursor = 'pointer';
+
+  const glowColors = ['#8b5cf6', '#f59e0b', '#0ea5e9', '#ec4899', '#10b981'];
+  const glow = glowColors[Math.floor(Math.random() * glowColors.length)];
+
+  // Create hover highlight
+  const highlight = document.createElement('div');
+  highlight.style.position = 'absolute';
+  highlight.style.pointerEvents = 'none';
+  highlight.style.border = '2px dashed #6366f1';
+  highlight.style.borderRadius = '4px';
+  highlight.style.transition = 'all 0.2s ease';
+  highlight.style.zIndex = '999999';
+  highlight.style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
+  document.body.appendChild(highlight);
+  window.__clickToEditHighlight__ = highlight;
+
+  // Floating popup stays while editing
+  showPopup('🖊️ Click on any text to edit it');
+
+  // Mousemove = update hover box
+  window.__clickToEditHoverHandler__ = function (e) {
+    const el = e.target;
+    if (el.nodeType === 1 && el.textContent.trim().length > 0) {
+      const rect = el.getBoundingClientRect();
+      highlight.style.width = rect.width + 'px';
+      highlight.style.height = rect.height + 'px';
+      highlight.style.top = window.scrollY + rect.top + 'px';
+      highlight.style.left = window.scrollX + rect.left + 'px';
+    } else {
+      highlight.style.width = '0';
+      highlight.style.height = '0';
+    }
+  };
+
+  // Click = activate editing
+  window.__clickToEditHandler__ = function (e) {
+    const el = e.target;
+
+    if (el.nodeType === 1 && el.textContent.trim().length > 0) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      el.setAttribute('contenteditable', 'true');
+      el.focus();
+
+      highlight.style.display = 'none';
+
+      // Listen for blur to exit edit mode
+      const onBlur = () => {
+        el.removeEventListener('blur', onBlur);
+        el.removeAttribute('contenteditable');
+        hidePopup();
+        deactivate();
+      };
+
+      el.addEventListener('blur', onBlur, { once: true });
+
+      // Remove further edit triggers for now
+      document.removeEventListener('click', window.__clickToEditHandler__, true);
+      document.removeEventListener('mousemove', window.__clickToEditHoverHandler__, true);
+    }
+  };
+
+  document.addEventListener('mousemove', window.__clickToEditHoverHandler__, true);
+  document.addEventListener('click', window.__clickToEditHandler__, true);
+
+  // Show popup
+  function showPopup(message) {
+    const existing = document.querySelector('#click-to-edit-popup');
+    if (existing) existing.remove();
+
+    const popup = document.createElement('div');
+    popup.id = 'click-to-edit-popup';
+    popup.textContent = message;
+    popup.style.position = 'fixed';
+    popup.style.top = '20px';
+    popup.style.left = '50%';
+    popup.style.transform = 'translateX(-50%) translateY(-10px)';
+    popup.style.padding = '12px 20px';
+    popup.style.borderRadius = '12px';
+    popup.style.zIndex = '999999';
+    popup.style.opacity = '0';
+    popup.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+    popup.style.pointerEvents = 'none';
+    popup.style.boxShadow = `0 0 12px ${glow}, 0 0 24px ${glow}88`;
+    popup.style.backdropFilter = 'blur(6px)';
+    popup.style.fontFamily = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    popup.style.fontSize = '16px';
+    popup.style.fontWeight = '500';
+    popup.style.textAlign = 'center';
+    popup.style.color = '#fff';
+    popup.style.backgroundColor = '#000000cc';
+
+    document.body.appendChild(popup);
+    setTimeout(() => {
+      popup.style.opacity = '1';
+      popup.style.transform = 'translateX(-50%) translateY(0)';
+    }, 10);
+  }
+
+  // Hide popup
+  function hidePopup() {
+    const popup = document.querySelector('#click-to-edit-popup');
+    if (popup) {
+      popup.style.opacity = '0';
+      popup.style.transform = 'translateX(-50%) translateY(-10px)';
+      setTimeout(() => popup.remove(), 1000);
+    }
+  }
+
+  // Cleanup
+  function deactivate() {
+    window.__clickToEditActive__ = false;
+    document.body.style.cursor = '';
+    document.removeEventListener('click', window.__clickToEditHandler__, true);
+    document.removeEventListener('mousemove', window.__clickToEditHoverHandler__, true);
+    if (window.__clickToEditHighlight__) {
+      window.__clickToEditHighlight__.remove();
+      window.__clickToEditHighlight__ = null;
+    }
+    hidePopup();
+  }
+})();
