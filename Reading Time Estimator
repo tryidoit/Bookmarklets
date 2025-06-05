@@ -1,4 +1,7 @@
 javascript:(function () {
+  if (window.__readingTimePopupActive__) return; // prevent double execution
+  window.__readingTimePopupActive__ = true;
+
   const BLACKLIST_SELECTORS = [
     'nav', 'header', 'footer', 'aside',
     '.sidebar', '.advertisement', '.ads',
@@ -6,7 +9,11 @@ javascript:(function () {
     '[class*="sidebar"]', '[class*="nav"]', '[id*="sidebar"]'
   ];
 
-  const AVG_READING_SPEED = 250; // words per minute
+  const AVG_READING_SPEED = 200;
+
+  // Remove previous popup
+  const oldPopup = document.querySelector('#reading-time-popup');
+  if (oldPopup) oldPopup.remove();
 
   // Temporarily hide blacklisted elements
   const removed = [];
@@ -17,20 +24,27 @@ javascript:(function () {
     });
   });
 
-  // Count words
-  const text = document.body.innerText || "";
+  // Get text and count words
+  const text = document.body.innerText || '';
   const wordCount = (text.match(/\b\w+\b/g) || []).length;
   const minutes = Math.ceil((wordCount / AVG_READING_SPEED) * 10) / 10;
 
-  // Restore blacklisted elements
+  // Restore hidden elements
   removed.forEach(el => el.style.display = '');
 
-  // Choose random glow color
-  const glowColors = ['#ffffff', '#3b82f6', '#fbbf24', '#a855f7']; // white, blue, gold, purple
+  // Choose stylish glow color
+  const glowColors = [
+    '#8b5cf6', // purple
+    '#f59e0b', // gold
+    '#0ea5e9', // sky blue
+    '#ec4899', // rose
+    '#10b981'  // emerald
+  ];
   const glow = glowColors[Math.floor(Math.random() * glowColors.length)];
 
-  // Create modern popup
+  // Create the popup
   const popup = document.createElement('div');
+  popup.id = 'reading-time-popup';
   popup.innerHTML = `
     <div style="font-weight: 600; font-size: 18px;">Estimated Reading Time</div>
     <div style="font-size: 15px; margin-top: 4px;">${minutes} min • ${wordCount} words</div>
@@ -50,7 +64,7 @@ javascript:(function () {
   popup.style.fontFamily = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
   popup.style.textAlign = 'center';
 
-  // Background and text color contrast
+  // Contrast-aware color
   const bgColor = getComputedStyle(document.body).backgroundColor;
   const getLuminance = (color) => {
     const rgb = color.match(/\d+/g)?.map(Number);
@@ -79,6 +93,9 @@ javascript:(function () {
   setTimeout(() => {
     popup.style.opacity = '0';
     popup.style.transform = 'translateX(-50%) translateY(-10px)';
-    setTimeout(() => popup.remove(), 1000);
+    setTimeout(() => {
+      popup.remove();
+      window.__readingTimePopupActive__ = false;
+    }, 1000);
   }, 5000);
 })();
