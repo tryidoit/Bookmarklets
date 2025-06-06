@@ -1,3 +1,6 @@
+//Blurs the webpage you are currently on, with 5 different settings, 0% blur, 10% blur, 25% blur, 50% blur, and 1000% blur.
+/I made this
+
 javascript:(function () {
   const body = document.body;
 
