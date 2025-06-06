@@ -1,3 +1,6 @@
+//Estimates how long it would take an average person to read all the main text in a webpage. 
+//Made by me
+
 javascript:(function () {
   if (window.__readingTimePopupActive__) return; // prevent double execution
   window.__readingTimePopupActive__ = true;
