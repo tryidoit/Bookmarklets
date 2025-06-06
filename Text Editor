@@ -1,3 +1,5 @@
+//Allows you to temporarily edit any text on a webpage.
+//Made by Tryidoit
 javascript:(function () {
   // Turn off if already active
   if (window.__clickToEditActive__) {
